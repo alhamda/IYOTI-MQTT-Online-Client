@@ -13,14 +13,14 @@ export default function SubscriptionItem({
   onClick: any
 }) {
   const dispatch = useAppDispatch();
-  
-  function remove(){
+
+  function remove() {
     dispatch(removeSubscription(subscription));
   }
 
   return (
-    <div className={clsx('transition-all group cursor-pointer flex items-center justify-between space-x-5 p-3 border-b w-full border-r-[2.5px]', isSelected ? 'border-r-emerald-500 text-emerald-500 font-medium bg-emerald-50/30 hover:bg-emerald-50/30' : 'hover:bg-slate-50 text-slate-600 border-r-transparent')} onClick={onClick}>
-      <div className="relative flex flex-col space-y-1 px-2 group">
+    <div className={clsx('transition-all group cursor-pointer flex items-center justify-between space-x-5 p-3 border-b w-full border-r-[2.5px]', isSelected ? 'border-r-emerald-500 text-emerald-500 font-medium bg-emerald-50/30 hover:bg-emerald-50/30' : 'hover:bg-slate-50 text-slate-600 border-r-transparent')}>
+      <div className="grow flex flex-col space-y-1 px-2 group" onClick={onClick}>
         <div className="line-clamp-1 break-all text-sm">{subscription.topic}</div>
         <div className="text-gray-400 flex-shrink-0 text-xs font-normal">Qos {subscription.qos}</div>
       </div>

@@ -7,8 +7,8 @@ export default function Publish() {
         <div className="flex items-center px-3 text-gray-700">
           <span>QoS:</span>
           <select className="ml-2 block w-full px-4 py-2 text-gray-700 placeholder-gray-400  border border-transparent focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40 min-w-[70px]">
-            <option>0</option>
-            <option selected={true}>1</option>
+            <option selected>0</option>
+            <option>1</option>
             <option>2</option>
           </select>
         </div>

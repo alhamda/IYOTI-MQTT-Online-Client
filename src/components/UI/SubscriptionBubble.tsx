@@ -14,7 +14,7 @@ export default function SubscriptionBubble({ subscriptionItem }: { subscriptionI
 
   return (
     <div className="mb-6">
-      <div className="w-min min-w-[25rem] bg-white rounded-lg rounded-tl-none border max-w-[70%]">
+      <div className="bg-white rounded-md border">
         <div className="pt-4 px-4 flex items-center">
           <div className="text-xs w-full text-gray-500 line-clamp-1 break-all">Topic: {subscriptionItem.topic}</div>
           <div className="ml-2 text-xs text-gray-500 flex-shrink-0">QoS: {subscriptionItem.qos}</div>

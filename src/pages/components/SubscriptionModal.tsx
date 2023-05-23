@@ -2,7 +2,9 @@ import { Fragment, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import Required from '@/components/UI/Required';
 import { useAppDispatch } from '@/redux/hooks';
-import { addSubscription } from '@/redux/slices/mqttSlice';
+import { addSubscription, addSubscriptionItem } from '@/redux/slices/mqttSlice';
+import { v4 as uuidv4 } from 'uuid';
+import { Subscription, SubscriptionItem } from '@/models/Subscription';
 
 const SubscriptionModal = (
   { isOpen, setIsOpen }:
@@ -19,12 +21,39 @@ const SubscriptionModal = (
   }
 
   function doAdd() {
-    dispatch(addSubscription({
-      id: Math.random().toString(),
+    let subscriptionId = uuidv4();
+    let subscriptionItemId = uuidv4();
+    let subscriptionItemId2 = uuidv4();
+
+    let subscription: Subscription = {
+      id: subscriptionId,
       qos: +qos,
       topic
-    }));
+    };
+
+    let subscriptionItem: SubscriptionItem = {
+      id: subscriptionItemId,
+      subscriptionId: subscriptionId,
+      date: new Date(),
+      message: JSON.stringify(subscription),
+      qos: subscription.qos,
+      topic: subscription.topic,
+    }
+
+    let subscriptionItem2: SubscriptionItem = {
+      id: Math.random().toString(),
+      subscriptionId: subscriptionId,
+      date: new Date(),
+      message: JSON.stringify(subscriptionItem),
+      qos: subscription.qos,
+      topic: subscription.topic,
+    }
+
+    dispatch(addSubscription(subscription));
+    dispatch(addSubscriptionItem(subscriptionItem));
+    dispatch(addSubscriptionItem(subscriptionItem2));
     
+
     closeModal();
   }
 

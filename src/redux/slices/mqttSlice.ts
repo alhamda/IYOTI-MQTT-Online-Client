@@ -29,11 +29,14 @@ export const mqttSlice = createSlice({
       state.subscriptions.push(payload);
     },
     removeSubscription: (state, { payload }: { payload: Subscription }) => {
-      state.subscriptions = state.subscriptions.filter((subscription) => subscription.id != payload.id);
-      state.subscriptionItems = state.subscriptionItems.filter((item) => item.subscriptionId != payload.id);
+      return {
+        ...state,
+        subscriptions: state.subscriptions.filter((subscription) => subscription.id != payload.id),
+        subscriptionItems: state.subscriptionItems.filter((item) => item.subscriptionId != payload.id)
+      }
     },
-    addSubscriptionItem: (state, action) => {
-      state.subscriptionItems.push(action.payload);
+    addSubscriptionItem: (state, { payload }: { payload: SubscriptionItem }) => {
+      state.subscriptionItems.push(payload);
     }
   },
 });

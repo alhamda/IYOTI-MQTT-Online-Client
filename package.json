@@ -13,17 +13,21 @@
     "@headlessui/react": "^1.7.14",
     "@reduxjs/toolkit": "^1.9.5",
     "clsx": "^1.2.1",
+    "randomstring": "^1.2.3",
     "rc-json-view": "^1.21.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^8.0.5",
-    "react-router-dom": "^6.11.2"
+    "react-router-dom": "^6.11.2",
+    "redux-persist": "^6.0.0",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.3",
     "@types/node": "^20.2.1",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
+    "@types/uuid": "^9.0.1",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
     "@vitejs/plugin-react": "^4.0.0",
