@@ -1,5 +1,6 @@
 import { SubscriptionItem } from "@/models/Subscription";
 import ReactJson from "rc-json-view";
+import moment from "moment";
 
 export default function SubscriptionBubble({ subscriptionItem }: { subscriptionItem: SubscriptionItem }) {
 
@@ -35,7 +36,7 @@ export default function SubscriptionBubble({ subscriptionItem }: { subscriptionI
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
 
-        12 September 2023 12:34:54:4343</span>
+        {moment(subscriptionItem.date).format('DD MMMM YYYY HH:mm:ss:SSS')}</span>
     </div>
   )
 }

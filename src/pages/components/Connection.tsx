@@ -1,11 +1,58 @@
 import { useState } from "react";
 import Required from "@/components/UI/Required";
 import clsx from "clsx";
+import { useDispatch } from "react-redux";
+import { useAppSelector } from "@/redux/hooks";
+import { selectConnection } from "@/redux/slices/mqttSlice";
+import { z } from "zod";
+import { withZodSchema } from 'formik-validator-zod'
+import { ErrorMessage, Field, Form, Formik, FormikValues } from 'formik';
 
 export default function Connection() {
 
+  const dispatch = useDispatch();
+  const connection = useAppSelector(selectConnection);
+
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [useLastWill, setUseLastWill] = useState<boolean>(false);
+
+  const formSchema = z.object({
+    host: z.string().min(1, 'Required').trim(),
+    port: z.number().min(1, 'Invalid Port'),
+    clientId: z.string().min(1, 'Required').trim(),
+    username: z.string().trim().nullable(),
+    password: z.string().nullable(),
+    keepAlive: z.number().min(1, 'Invalid'),
+    cleanSession: z.boolean(),
+    sslTls: z.boolean(),
+    lastWill: z.boolean(),
+    lastWillTopic: z.string().trim().nullable(),
+    lastWillQos: z.enum(['0', '1', '2']),
+    lastWillRetain: z.boolean(),
+    lastWillMessage: z.string().trim().nullable(),
+  });
+
+  type formSchemaType = z.infer<typeof formSchema>;
+
+  const [initialValues, setInitialValues] = useState<formSchemaType>({
+    host: connection.host ?? '',
+    port: connection.port ?? 1883,
+    cleanSession: connection.cleanSession ?? true,
+    clientId: connection.clientId ?? '',
+    keepAlive: connection.keepAlive ?? 60,
+    lastWill: connection.lastWill ?? false,
+    lastWillMessage: connection.lastWillMessage ?? '',
+    lastWillRetain: connection.lastWillRetain ?? false,
+    lastWillTopic: connection.lastWillTopic ?? '',
+    sslTls: connection.sslTls ?? false,
+    username: connection.username ?? '',
+    password: connection.password ?? '',
+    lastWillQos: connection.lastWillQos ?? '0',
+  });
+
+  const submitForm = (values: FormikValues) => {
+
+  }
 
   return (
     <div className="bg-white shadow-lg rounded-t-md border-b">
@@ -39,123 +86,138 @@ export default function Connection() {
         </div>
       </div>
       <div className={clsx(`p-5 border-t`, isConnected ? 'hidden' : 'block')}>
-        <div className="grid grid-cols-3 gap-y-3 gap-x-5">
-          <div>
-            <label className="block mb-3 text-sm text-gray-700">
-              Host <Required />
-            </label>
-
-            <input type="text" className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40" value="free.mqtt.iyoti.id" />
-          </div>
-
-          <div>
-            <label className="block mb-3 text-sm text-gray-700">
-              Port <Required />
-            </label>
-
-            <input type="number" className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40" value="8083" />
-          </div>
-
-          <div>
-            <label className="block mb-3 text-sm text-gray-700">
-              Client ID <Required />
-            </label>
-
-            <div className="flex">
-
-              <input type="text" className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40 rounded-r-none" value="mqtt_iyoti_df343df2431" />
-
-              <button className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-100 border border-l-0 border-gray-300 rounded-r-md hover:bg-gray-200">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-                </svg>
-
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <label className="block mb-3 text-sm text-gray-700">
-              Username
-            </label>
-
-            <input type="text" className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40" />
-          </div>
-
-          <div>
-            <label className="block mb-3 text-sm text-gray-700">
-              Password
-            </label>
-
-            <input type="password" className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40" />
-          </div>
-
-          <div className="flex space-x-5 items-start">
-            <div>
-              <label className="block mb-3 text-sm text-gray-700">
-                Keep Alive
-              </label>
-              <input type="number" value="60" className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40" />
-            </div>
-            <div className="mt-2 flex flex-col w-full items-end space-y-0.5">
-              <div className="w-full flex items-center">
-                <input id="cleanSession" type="checkbox" className="w-3.5 h-3.5 text-blue-500 bg-gray-100 border-gray-300 rounded focus:ring-0 focus:ring-transparent" />
-                <label htmlFor="cleanSession" className="ml-2 text-sm">Clean Session</label>
-              </div>
-              <div className="w-full flex items-center">
-                <input id="ssl" type="checkbox" className="w-3.5 h-3.5 text-blue-500 bg-gray-100 border-gray-300 rounded focus:ring-0 focus:ring-transparent" />
-                <label htmlFor="ssl" className="ml-2 text-sm">SSL/TLS</label>
-              </div>
-              <div className="w-full flex items-center">
-                <input id="lastWill" type="checkbox" className="w-3.5 h-3.5 text-blue-500 bg-gray-100 border-gray-300 rounded focus:ring-0 focus:ring-transparent" onChange={(e) => setUseLastWill(e.target.checked)} />
-                <label htmlFor="lastWill" className="ml-2 text-sm">Last Will and Testament</label>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className={clsx(`grid grid-cols-3 gap-y-3 gap-x-5 mt-5`, useLastWill ? '' : 'hidden')}>
-          <div className="col-span-2">
-            <label className="block mb-3 text-sm text-gray-700">
-              Last-Will Topic
-            </label>
-
-            <input type="text" className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40" />
-          </div>
-
-          <div className="flex space-x-5 items-center">
-            <div className="w-full">
-              <label className="block mb-3 text-sm text-gray-700">
-                Last-Will QoS
-              </label>
-
-              <select className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40">
-                <option>0</option>
-                <option>1</option>
-                <option>2</option>
-              </select>
-            </div>
-            <div className="w-full">
+        <Formik
+          initialValues={initialValues}
+          validate={withZodSchema(formSchema)}
+          onSubmit={submitForm}
+          enableReinitialize={true}
+        >
+          {() => <Form autoComplete='off'>
+            <div className="grid grid-cols-3 gap-y-3 gap-x-5">
               <div>
                 <label className="block mb-3 text-sm text-gray-700">
-                  Last-Will Retain
+                  Host <Required />
                 </label>
 
-                <select className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40">
-                  <option>False</option>
-                  <option>True</option>
-                </select>
+                <Field name="host" type="text" className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40" />
+
+                <ErrorMessage name="host" component='div' className='text-red-600 mt-2 font-normal text-xs' />
+              </div>
+
+              <div>
+                <label className="block mb-3 text-sm text-gray-700">
+                  Port <Required />
+                </label>
+
+                <Field name="port" type="number" className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40" />
+
+                <ErrorMessage name="port" component='div' className='text-red-600 mt-2 font-normal text-xs' />
+              </div>
+
+              <div>
+                <label className="block mb-3 text-sm text-gray-700">
+                  Client ID <Required />
+                </label>
+
+                <div className="flex">
+
+                  <Field name="clientId" type="text" className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40 rounded-r-none" />
+
+                  <button className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-100 border border-l-0 border-gray-300 rounded-r-md hover:bg-gray-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                    </svg>
+
+                  </button>
+                </div>
+                <ErrorMessage name="clientId" component='div' className='text-red-600 mt-2 font-normal text-xs' />
+              </div>
+
+              <div>
+                <label className="block mb-3 text-sm text-gray-700">
+                  Username
+                </label>
+
+                <input type="text" className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40" />
+              </div>
+
+              <div>
+                <label className="block mb-3 text-sm text-gray-700">
+                  Password
+                </label>
+
+                <input type="password" className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40" />
+              </div>
+
+              <div className="flex space-x-5 items-start">
+                <div>
+                  <label className="block mb-3 text-sm text-gray-700">
+                    Keep Alive
+                  </label>
+                  <input type="number" value="60" className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40" />
+                </div>
+                <div className="mt-2 flex flex-col w-full items-end space-y-0.5">
+                  <div className="w-full flex items-center">
+                    <input id="cleanSession" type="checkbox" className="w-3.5 h-3.5 text-blue-500 bg-gray-100 border-gray-300 rounded focus:ring-0 focus:ring-transparent" />
+                    <label htmlFor="cleanSession" className="ml-2 text-sm">Clean Session</label>
+                  </div>
+                  <div className="w-full flex items-center">
+                    <input id="ssl" type="checkbox" className="w-3.5 h-3.5 text-blue-500 bg-gray-100 border-gray-300 rounded focus:ring-0 focus:ring-transparent" />
+                    <label htmlFor="ssl" className="ml-2 text-sm">SSL/TLS</label>
+                  </div>
+                  <div className="w-full flex items-center">
+                    <input id="lastWill" type="checkbox" className="w-3.5 h-3.5 text-blue-500 bg-gray-100 border-gray-300 rounded focus:ring-0 focus:ring-transparent" onChange={(e) => setUseLastWill(e.target.checked)} />
+                    <label htmlFor="lastWill" className="ml-2 text-sm">Last Will and Testament</label>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+            <div className={clsx(`grid grid-cols-3 gap-y-3 gap-x-5 mt-5`, useLastWill ? '' : 'hidden')}>
+              <div className="col-span-2">
+                <label className="block mb-3 text-sm text-gray-700">
+                  Last-Will Topic
+                </label>
 
-          <div className="col-span-3">
-            <label className="block mb-3 text-sm text-gray-700">
-              Last-Will Message
-            </label>
+                <input type="text" className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40" />
+              </div>
 
-            <textarea rows={4} className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40" />
-          </div>
-        </div>
+              <div className="flex space-x-5 items-center">
+                <div className="w-full">
+                  <label className="block mb-3 text-sm text-gray-700">
+                    Last-Will QoS
+                  </label>
+
+                  <select className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40">
+                    <option>0</option>
+                    <option>1</option>
+                    <option>2</option>
+                  </select>
+                </div>
+                <div className="w-full">
+                  <div>
+                    <label className="block mb-3 text-sm text-gray-700">
+                      Last-Will Retain
+                    </label>
+
+                    <select className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40">
+                      <option>False</option>
+                      <option>True</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-span-3">
+                <label className="block mb-3 text-sm text-gray-700">
+                  Last-Will Message
+                </label>
+
+                <textarea rows={4} className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40" />
+              </div>
+            </div>
+          </Form>
+          }
+        </Formik>
 
       </div>
     </div>

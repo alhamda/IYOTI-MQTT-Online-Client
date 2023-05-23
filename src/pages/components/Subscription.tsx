@@ -36,8 +36,8 @@ export default function Subscription() {
     <>
       {showModal && <SubscriptionModal isOpen={showModal} setIsOpen={setShowModal} />}
       <div className="bg-white shadow-lg">
-        <div className="flex flex-row max-h-[850px]">
-          <div className="flex flex-col min-w-[270px] max-h-full">
+        <div className="flex flex-row max-h-[870px]">
+          <div className="flex flex-col min-w-[270px] h-full sticky top-0">
 
             <div className="border-b p-5">
               <button onClick={() => setShowModal(true)} className="font-medium border flex w-full items-center justify-center flex-grow-0 px-4 py-2.5 transition-colors duration-200 bg-gray-100 rounded-md hover:bg-gray-200 hover:border-bg:gray-200 focus:outline-none">
@@ -61,7 +61,7 @@ export default function Subscription() {
           </div>
           <div className="flex w-full">
             <div className="flex flex-col h-full w-full border border-t-0 border-b-0">
-              <div className="p-3 px-5 border-b flex justify-between">
+              <div className="p-3 px-5 border-b flex justify-between bg-white sticky -top-1 z-10">
                 <div className="flex items-center justify-between space-x-4">
                   <div className="flex items-center">
                     <input id="autoJson" type="checkbox" className="w-3.5 h-3.5 text-blue-500 bg-gray-100 border-gray-300 rounded focus:ring-0 focus:ring-transparent" />
