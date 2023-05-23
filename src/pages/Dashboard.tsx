@@ -3,7 +3,7 @@ import Subscription from "@/pages/components/Subscription";
 
 export default function Dashboard() {
   return (
-    <div className="max-w-6xl mx-auto py-10 w-full">
+    <div className="lg:max-w-6xl mx-auto lg:py-10 w-full">
       <Connection />
       <Subscription />
 

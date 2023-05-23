@@ -1,13 +1,40 @@
+import Editor, { DiffEditor, useMonaco, loader, Monaco } from '@monaco-editor/react';
+import { useState } from 'react';
+
+const monacoOptions = {
+  readOnly: false,
+  minimap: { enabled: false },
+  renderValidationDecorations: 'off',
+  renderLineHighlight: 'none',
+  lineNumbers: 'off',
+  glyphMargin: false,
+  folding: false,
+  lineDecorationsWidth: 0,
+  lineNumbersMinChars: 0
+};
 
 export default function Publish() {
+
+  let defaultMessage = `{\n\t"greeting":"Hello!"\n}`;
+
+  const [topic, setTopic] = useState<string>('');
+  const [qos, setQos] = useState<string>('0');
+  const [message, setMessage] = useState<string>(defaultMessage);
+
+  const handleEditorOnChange = (
+    value: string | undefined
+  ) => {
+    if (value) setMessage(value);
+  };
+
   return (
     <>
       <div className="flex flex-row">
-        <input type="text" className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400  border border-transparent focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40" placeholder="Topic" />
+        <input onChange={(e) => setTopic(e.target.value)} value={topic} type="text" className="text-sm bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400  border border-transparent focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40" placeholder="Topic" />
         <div className="flex items-center px-3 text-gray-700">
           <span>QoS:</span>
-          <select className="ml-2 block w-full px-4 py-2 text-gray-700 placeholder-gray-400  border border-transparent focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40 min-w-[70px]">
-            <option selected>0</option>
+          <select value={qos} onChange={(e) => setQos(e.target.value)} className="ml-2 block w-full px-4 py-2 text-gray-700 placeholder-gray-400  border border-transparent focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40 min-w-[70px]">
+            <option>0</option>
             <option>1</option>
             <option>2</option>
           </select>
@@ -19,8 +46,15 @@ export default function Publish() {
           <span>Publish</span>
         </button>
       </div>
-      <div className="flex border-t">
-        <textarea autoComplete="off" className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-transparent focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40 min-h-[150px] max-h-[200px]" placeholder="Message" rows={5} />
+      <div className="relative flex border-t">
+        <Editor
+          className='pt-3 pl-[1.05rem] text-gray-700 placeholder-gray-400 border border-transparent focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40'
+          height="180px"
+          defaultValue={message}
+          options={monacoOptions}
+          defaultLanguage="json"
+          onChange={handleEditorOnChange}
+        />
       </div>
     </>
   )

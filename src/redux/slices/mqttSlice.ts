@@ -89,6 +89,13 @@ export const mqttSlice = createSlice({
         ...payload
       }
     },
+    clearHistory: (state, action) => {
+      if (action.payload) {
+        state.subscriptionItems = state.subscriptionItems.filter((item) => item.subscriptionId != action.payload)
+      } else {
+        state.subscriptionItems = [];
+      }
+    }
   },
 });
 
@@ -99,6 +106,7 @@ export const {
   removeSubscription,
   setConnection,
   setSetting,
+  clearHistory,
 } = mqttSlice.actions;
 
 export const selectSubscriptions = (state: RootState) => state.mqtt.subscriptions;
@@ -106,6 +114,7 @@ export const selectSubscriptionItems = (state: RootState) => state.mqtt.subscrip
 export const selectPublishes = (state: RootState) => state.mqtt.publishes;
 export const selectConnection = (state: RootState) => state.mqtt.connection;
 export const selectSetting = (state: RootState) => state.mqtt.setting;
+export const selectStatus = (state: RootState) => state.mqtt.status;
 
 
 export default mqttSlice.reducer;
