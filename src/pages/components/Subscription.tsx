@@ -2,8 +2,8 @@ import SubscriptionBubble from "@/components/UI/SubscriptionBubble";
 import SubscriptionItem from "@/components/UI/SubscriptionItem";
 import Publish from "@/pages/components/Publish";
 import SubscriptionModal from "@/pages/components/SubscriptionModal";
-import { useAppSelector } from "@/redux/hooks";
-import { selectSubscriptionItems, selectSubscriptions } from "@/redux/slices/mqttSlice";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { selectSetting, selectSubscriptionItems, selectSubscriptions, setSetting } from "@/redux/slices/mqttSlice";
 import { useEffect, useRef, useState } from "react";
 
 const AlwaysScrollToBottom = () => {
@@ -13,6 +13,9 @@ const AlwaysScrollToBottom = () => {
 };
 
 export default function Subscription() {
+
+  const dispatch = useAppDispatch();
+  const setting = useAppSelector(selectSetting);
 
   const subscriptions = useAppSelector(selectSubscriptions);
   const subscriptionItems = useAppSelector(selectSubscriptionItems);
@@ -60,15 +63,24 @@ export default function Subscription() {
             </div>
           </div>
           <div className="flex w-full">
-            <div className="flex flex-col h-full w-full border border-t-0 border-b-0">
+            <div className="flex flex-col h-full w-full border border-r-0 border-t-0 border-b-0">
               <div className="p-3 px-5 border-b flex justify-between bg-white sticky -top-1 z-10">
                 <div className="flex items-center justify-between space-x-4">
                   <div className="flex items-center">
-                    <input id="autoJson" type="checkbox" className="w-3.5 h-3.5 text-blue-500 bg-gray-100 border-gray-300 rounded focus:ring-0 focus:ring-transparent" />
+                    <input id="autoJson" type="checkbox" className="w-3.5 h-3.5 text-blue-500 bg-gray-100 border-gray-300 rounded focus:ring-0 focus:ring-transparent" checked={setting.autoJson} onChange={(e) => {
+                      dispatch(setSetting({
+                        autoJson: e.target.checked
+                      }));
+                    }} />
                     <label htmlFor="autoJson" className="ml-2 text-xs">Auto format JSON</label>
                   </div>
                   <div className="flex items-center">
-                    <input id="autoScroll" type="checkbox" className="w-3.5 h-3.5 text-blue-500 bg-gray-100 border-gray-300 rounded focus:ring-0 focus:ring-transparent" />
+                    <input id="autoScroll" type="checkbox" className="w-3.5 h-3.5 text-blue-500 bg-gray-100 border-gray-300 rounded focus:ring-0 focus:ring-transparent"
+                      checked={setting.autoScroll} onChange={(e) => {
+                        dispatch(setSetting({
+                          autoScroll: e.target.checked
+                        }));
+                      }} />
                     <label htmlFor="autoScroll" className="ml-2 text-xs">Auto scroll</label>
                   </div>
                 </div>
@@ -88,7 +100,7 @@ export default function Subscription() {
                   return <SubscriptionBubble key={item.id} subscriptionItem={item} />;
                 })}
 
-                {(subscriptionId && subscriptionItems.length > 0) && <AlwaysScrollToBottom />}
+                {(subscriptionId && subscriptionItems.length > 0 && setting.autoScroll) && <AlwaysScrollToBottom />}
 
                 {subscriptionItems.length == 0 && <div className="flex w-full h-full items-center justify-center flex-col">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-20 h-20 text-gray-400/70">

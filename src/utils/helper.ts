@@ -6,3 +6,7 @@ export function randomString(length: number) {
 
   return result;
 }
+
+export function generateRandomClientId(){
+  return 'mqtt_iyoti_' + randomString(10);
+}

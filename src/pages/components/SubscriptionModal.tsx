@@ -6,10 +6,13 @@ import { addSubscription, addSubscriptionItem } from '@/redux/slices/mqttSlice';
 import { v4 as uuidv4 } from 'uuid';
 import { Subscription, SubscriptionItem } from '@/models/Subscription';
 
-const SubscriptionModal = (
-  { isOpen, setIsOpen }:
-    { isOpen: boolean; setIsOpen: any }
-) => {
+const SubscriptionModal = ({
+  isOpen,
+  setIsOpen
+}: {
+  isOpen: boolean;
+  setIsOpen: any
+}) => {
 
   const dispatch = useAppDispatch();
 
@@ -52,7 +55,7 @@ const SubscriptionModal = (
     dispatch(addSubscription(subscription));
     dispatch(addSubscriptionItem(subscriptionItem));
     dispatch(addSubscriptionItem(subscriptionItem2));
-    
+
 
     closeModal();
   }

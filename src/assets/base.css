@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@keyframes slide {
+  from {max-height: 0;}
+  to {max-height: 500px;}
+}

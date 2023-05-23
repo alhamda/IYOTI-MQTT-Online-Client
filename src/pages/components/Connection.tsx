@@ -7,6 +7,7 @@ import { selectConnection } from "@/redux/slices/mqttSlice";
 import { z } from "zod";
 import { withZodSchema } from 'formik-validator-zod'
 import { ErrorMessage, Field, Form, Formik, FormikValues } from 'formik';
+import { generateRandomClientId } from "@/utils/helper";
 
 export default function Connection() {
 
@@ -34,11 +35,11 @@ export default function Connection() {
 
   type formSchemaType = z.infer<typeof formSchema>;
 
-  const [initialValues, setInitialValues] = useState<formSchemaType>({
+  const [initialValues] = useState<formSchemaType>({
     host: connection.host ?? '',
     port: connection.port ?? 1883,
     cleanSession: connection.cleanSession ?? true,
-    clientId: connection.clientId ?? '',
+    clientId: connection.clientId ?? generateRandomClientId(),
     keepAlive: connection.keepAlive ?? 60,
     lastWill: connection.lastWill ?? false,
     lastWillMessage: connection.lastWillMessage ?? '',
@@ -60,7 +61,7 @@ export default function Connection() {
         <div className="text-lg flex flex-col space-y-0.5">
           <div className="flex items-center">
             <div className="font-semibold mb-0">MQTT Online Client</div>
-            <div className="ml-2 text-xs text-gray-500">by <span className="text-sm text-emerald-600 hover:underline hover:cursor-pointer">iyoti</span></div>
+            <div className="ml-2 text-xs text-gray-500">by <span className="text-sm text-emerald-600 hover:underline hover:cursor-pointer">Iyoti</span></div>
           </div>
           <div className="flex items-center space-x-2 text-sm pt-1">
             <span className="relative flex h-3 w-3">
@@ -92,7 +93,7 @@ export default function Connection() {
           onSubmit={submitForm}
           enableReinitialize={true}
         >
-          {() => <Form autoComplete='off'>
+          {({ setFieldValue }) => <Form autoComplete='off'>
             <div className="grid grid-cols-3 gap-y-3 gap-x-5">
               <div>
                 <label className="block mb-3 text-sm text-gray-700">
@@ -123,13 +124,14 @@ export default function Connection() {
 
                   <Field name="clientId" type="text" className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40 rounded-r-none" />
 
-                  <button className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-100 border border-l-0 border-gray-300 rounded-r-md hover:bg-gray-200">
+                  <button onClick={() => setFieldValue('clientId', generateRandomClientId())} className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-100 border border-l-0 border-gray-300 rounded-r-md hover:bg-gray-200">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                     </svg>
-
                   </button>
+
                 </div>
+
                 <ErrorMessage name="clientId" component='div' className='text-red-600 mt-2 font-normal text-xs' />
               </div>
 
@@ -156,7 +158,7 @@ export default function Connection() {
                   </label>
                   <input type="number" value="60" className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40" />
                 </div>
-                <div className="mt-2 flex flex-col w-full items-end space-y-0.5">
+                <div className="mt-2 flex flex-col w-full items-end space-y-1">
                   <div className="w-full flex items-center">
                     <input id="cleanSession" type="checkbox" className="w-3.5 h-3.5 text-blue-500 bg-gray-100 border-gray-300 rounded focus:ring-0 focus:ring-transparent" />
                     <label htmlFor="cleanSession" className="ml-2 text-sm">Clean Session</label>
@@ -220,6 +222,6 @@ export default function Connection() {
         </Formik>
 
       </div>
-    </div>
+    </div >
   )
 }

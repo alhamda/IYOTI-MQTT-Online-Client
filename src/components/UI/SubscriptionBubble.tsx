@@ -1,10 +1,16 @@
 import { SubscriptionItem } from "@/models/Subscription";
 import ReactJson from "rc-json-view";
 import moment from "moment";
+import { useAppSelector } from "@/redux/hooks";
+import { selectSetting } from "@/redux/slices/mqttSlice";
 
 export default function SubscriptionBubble({ subscriptionItem }: { subscriptionItem: SubscriptionItem }) {
 
+  const setting = useAppSelector(selectSetting);
+
   function isJsonString(str: string) {
+    if(!setting.autoJson) return false;
+
     try {
       JSON.parse(str);
     } catch (e) {
@@ -28,7 +34,7 @@ export default function SubscriptionBubble({ subscriptionItem }: { subscriptionI
               showComma={true}
               displayObjectSize={false}
               displayDataTypes={false}
-            /> : subscriptionItem.message}
+            /> : <p className="leading-6">{subscriptionItem.message}</p>}
         </div>
       </div>
       <span className="flex items-center text-xs text-gray-500 mt-2">

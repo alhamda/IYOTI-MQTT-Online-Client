@@ -1,7 +1,7 @@
 import { PublishItem } from '@/models/Publish';
 import { Subscription, SubscriptionItem } from '@/models/Subscription';
 import { RootState } from '@/redux/store';
-import { randomString } from '@/utils/helper';
+import { generateRandomClientId, randomString } from '@/utils/helper';
 import { createSlice } from '@reduxjs/toolkit';
 
 type initialStateType = {
@@ -24,7 +24,7 @@ export type Connection = {
   sslTls?: boolean,
   lastWill?: boolean,
   lastWillTopic?: string,
-  lastWillQos?: "0" | "1" | "2",
+  lastWillQos?: '0' | '1' | '2',
   lastWillRetain?: boolean,
   lastWillMessage?: string
 };
@@ -41,12 +41,12 @@ const initialState: initialStateType = {
   subscriptionItems: [],
   connection: {
     host: 'free.mqtt.iyoti.id',
-    port: '1883',
-    clientId: 'mqtt_iyoti_' + randomString(10),
+    port: 1883,
+    clientId: generateRandomClientId(),
     keepAlive: 60,
     cleanSession: true,
     lastWill: false,
-    lastWillQos: 0,
+    lastWillQos: '0',
     lastWillRetain: false,
     sslTls: false,
   },
