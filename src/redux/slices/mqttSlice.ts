@@ -3,6 +3,7 @@ import { Subscription, SubscriptionItem } from '@/models/Subscription';
 import { RootState } from '@/redux/store';
 import { generateRandomClientId } from '@/utils/helper';
 import { createSlice } from '@reduxjs/toolkit';
+import { MqttClient } from 'precompiled-mqtt';
 
 type initialStateType = {
   status: 'Connected' | 'Disconnected',
@@ -61,6 +62,9 @@ export const mqttSlice = createSlice({
   initialState: initialState,
   reducers: {
     reset: () => initialState,
+    setStatus: (state, { payload }: { payload: 'Connected' | 'Disconnected' }) => {
+      state.status = payload;
+    },
     addPublish: (state, action) => {
       state.publishes.push(action.payload);
     },
@@ -101,6 +105,7 @@ export const mqttSlice = createSlice({
 
 export const {
   reset,
+  setStatus,
   addSubscription,
   addSubscriptionItem,
   removeSubscription,
@@ -115,6 +120,5 @@ export const selectPublishes = (state: RootState) => state.mqtt.publishes;
 export const selectConnection = (state: RootState) => state.mqtt.connection;
 export const selectSetting = (state: RootState) => state.mqtt.setting;
 export const selectStatus = (state: RootState) => state.mqtt.status;
-
 
 export default mqttSlice.reducer;

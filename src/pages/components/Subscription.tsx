@@ -12,7 +12,7 @@ const AlwaysScrollToBottom = () => {
   return <div ref={elementRef} />;
 };
 
-export default function Subscription() {
+export default function Subscription({ mqttClient }: { mqttClient: any }) {
 
   const dispatch = useAppDispatch();
   const setting = useAppSelector(selectSetting);
@@ -23,21 +23,9 @@ export default function Subscription() {
   const [subscriptionId, setSubscriptionId] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
 
-  const messagesEndRef = useRef<null | HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
-
-  useEffect(() => {
-    setInterval(() => {
-      scrollToBottom()
-    }, 1000);
-  }, [subscriptionItems]);
-
   return (
     <>
-      {showModal && <SubscriptionModal isOpen={showModal} setIsOpen={setShowModal} />}
+      {showModal && <SubscriptionModal mqttClient={mqttClient} isOpen={showModal} setIsOpen={setShowModal} />}
       <div className="bg-white shadow-lg">
         <div className="flex flex-row max-h-[870px]">
           <div className="flex flex-col min-w-[270px]">
@@ -54,6 +42,7 @@ export default function Subscription() {
             <div className="overflow-y-auto">
               {subscriptions.map((subscription) => {
                 return <SubscriptionItem
+                  mqttClient={mqttClient}
                   key={subscription.id}
                   subscription={subscription}
                   onClick={() => setSubscriptionId(subscription.id)}
@@ -105,7 +94,7 @@ export default function Subscription() {
                   return <SubscriptionBubble key={item.id} subscriptionItem={item} />;
                 })}
 
-                {(subscriptionId && subscriptionItems.length > 0 && setting.autoScroll) && <AlwaysScrollToBottom />}
+                {(subscriptionItems.length > 0 && setting.autoScroll) && <AlwaysScrollToBottom />}
 
                 {subscriptionItems.length == 0 && <div className="flex w-full h-full items-center justify-center flex-col">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-20 h-20 text-gray-400/70">
@@ -121,7 +110,7 @@ export default function Subscription() {
                 </div>}
               </div>
               <div className="bg-white w-full border-t rounded-br-md">
-                <Publish />
+                <Publish mqttClient={mqttClient} />
               </div>
             </div>
           </div>

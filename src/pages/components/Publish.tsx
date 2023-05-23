@@ -13,7 +13,7 @@ const monacoOptions = {
   lineNumbersMinChars: 0
 };
 
-export default function Publish() {
+export default function Publish({ mqttClient }: { mqttClient: any }) {
 
   let defaultMessage = `{\n\t"greeting":"Hello!"\n}`;
 

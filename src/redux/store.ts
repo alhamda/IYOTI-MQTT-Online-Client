@@ -11,7 +11,7 @@ import mqttSlice from '@/redux/slices/mqttSlice';
 
 const persistConfig = {
   key: 'root',
-  storage
+  storage,
 };
 
 const reducers = combineReducers({

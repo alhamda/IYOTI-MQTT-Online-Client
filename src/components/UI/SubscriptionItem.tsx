@@ -1,3 +1,4 @@
+import useMqtt from "@/hooks/useMqtt";
 import { Subscription } from "@/models/Subscription";
 import { useAppDispatch } from "@/redux/hooks";
 import { removeSubscription } from "@/redux/slices/mqttSlice";
@@ -7,15 +8,18 @@ export default function SubscriptionItem({
   subscription,
   isSelected,
   onClick,
+  mqttClient,
 }: {
   subscription: Subscription,
   isSelected: boolean
-  onClick: any
+  onClick: any,
+  mqttClient: any,
 }) {
   const dispatch = useAppDispatch();
-  
-  function remove(){
-    dispatch(removeSubscription(subscription));
+
+  function remove() {
+    let unsubscribe = mqttClient.mqttUnSubscribe(subscription);
+    if (unsubscribe) dispatch(removeSubscription(subscription));
   }
 
   return (

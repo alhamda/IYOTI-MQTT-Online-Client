@@ -7,9 +7,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { Subscription, SubscriptionItem } from '@/models/Subscription';
 
 const SubscriptionModal = ({
+  mqttClient,
   isOpen,
-  setIsOpen
+  setIsOpen,
 }: {
+  mqttClient: any,
   isOpen: boolean;
   setIsOpen: any
 }) => {
@@ -23,39 +25,16 @@ const SubscriptionModal = ({
     setIsOpen(false)
   }
 
-  function doAdd() {
-    let subscriptionId = uuidv4();
-    let subscriptionItemId = uuidv4();
+  async function doAdd() {
 
     let subscription: Subscription = {
-      id: subscriptionId,
+      id: uuidv4(),
       qos: +qos,
       topic
     };
 
-    let subscriptionItem: SubscriptionItem = {
-      id: subscriptionItemId,
-      subscriptionId: subscriptionId,
-      date: new Date(),
-      message: JSON.stringify(subscription),
-      qos: subscription.qos,
-      topic: subscription.topic,
-    }
-
-    let subscriptionItem2: SubscriptionItem = {
-      id: Math.random().toString(),
-      subscriptionId: subscriptionId,
-      date: new Date(),
-      message: JSON.stringify(subscriptionItem),
-      qos: subscription.qos,
-      topic: subscription.topic,
-    }
-
+    await mqttClient.mqttSubscribe(subscription);
     dispatch(addSubscription(subscription));
-    dispatch(addSubscriptionItem(subscriptionItem));
-    dispatch(addSubscriptionItem(subscriptionItem2));
-
-
     closeModal();
   }
 

@@ -34,7 +34,7 @@ export default function SubscriptionBubble({ subscriptionItem }: { subscriptionI
               showComma={true}
               displayObjectSize={false}
               displayDataTypes={false}
-            /> : <p className="leading-6">{subscriptionItem.message}</p>}
+            /> : <p className="leading-6 break-all">{subscriptionItem.message}</p>}
         </div>
       </div>
       <span className="flex items-center text-xs text-gray-500 mt-2">

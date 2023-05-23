@@ -3,18 +3,19 @@ import Required from "@/components/UI/Required";
 import clsx from "clsx";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/hooks";
-import { selectConnection, setConnection } from "@/redux/slices/mqttSlice";
+import { selectConnection, selectStatus, setConnection } from "@/redux/slices/mqttSlice";
 import { z } from "zod";
 import { withZodSchema } from 'formik-validator-zod'
 import { ErrorMessage, Field, Form, Formik, FormikValues } from 'formik';
 import { generateRandomClientId } from "@/utils/helper";
 import ConnectionStatus from "@/components/UI/ConnectionStatus";
-import { toast } from "react-hot-toast";
 
-export default function Connection() {
+export default function Connection({ mqttClient }: { mqttClient: any }) {
 
   const dispatch = useDispatch();
+
   const connection = useAppSelector(selectConnection);
+  const connectionStatus = useAppSelector(selectStatus);
 
   const [isConnected] = useState<boolean>(false);
 
@@ -59,7 +60,7 @@ export default function Connection() {
       lastWillRetain: values.lastWillRetain == 'true',
     }));
 
-    toast.success('Connected');
+    mqttClient.mqttConnect();
   }
 
   return (
@@ -88,12 +89,24 @@ export default function Connection() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg> Advanced
           </button> */}
-              <button type="submit" className="flex w-full items-center justify-center flex-grow-0 px-4 py-2.5 text-white transition-colors duration-200 bg-emerald-500 rounded-md hover:bg-emerald-600 focus:outline-none font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
-                </svg>
-                Connect
-              </button>
+              {connectionStatus == 'Disconnected' &&
+                <button type="submit" className="flex w-full items-center justify-center flex-grow-0 px-4 py-2.5 text-white transition-colors duration-200 bg-emerald-500 rounded-md hover:bg-emerald-600 focus:outline-none font-medium">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                  </svg>
+                  Connect
+                </button>
+              }
+
+              {connectionStatus == 'Connected' &&
+                <button onClick={() => mqttClient.mqttDisconnect()} type="button" className="flex w-full items-center justify-center flex-grow-0 px-4 py-2.5 text-white transition-colors duration-200 bg-red-500 rounded-md hover:bg-red-600 focus:outline-none font-medium">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9" />
+                  </svg>
+                  Disconnect
+                </button>
+              }
+
             </div>
           </div>
           <div className={clsx(`p-5 border-t`, isConnected ? 'hidden' : 'block')}>
