@@ -1,7 +1,7 @@
 import { PublishItem } from '@/models/Publish';
 import { Subscription, SubscriptionItem } from '@/models/Subscription';
 import { RootState } from '@/redux/store';
-import { generateRandomClientId, randomString } from '@/utils/helper';
+import { generateRandomClientId } from '@/utils/helper';
 import { createSlice } from '@reduxjs/toolkit';
 
 type initialStateType = {

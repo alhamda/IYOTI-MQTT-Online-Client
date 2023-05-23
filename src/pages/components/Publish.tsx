@@ -1,4 +1,4 @@
-import Editor, { DiffEditor, useMonaco, loader, Monaco } from '@monaco-editor/react';
+import Editor from '@monaco-editor/react';
 import { useState } from 'react';
 
 const monacoOptions = {

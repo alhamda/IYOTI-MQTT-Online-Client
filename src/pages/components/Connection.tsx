@@ -3,7 +3,7 @@ import Required from "@/components/UI/Required";
 import clsx from "clsx";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/hooks";
-import { selectConnection, selectStatus, setConnection } from "@/redux/slices/mqttSlice";
+import { selectConnection, setConnection } from "@/redux/slices/mqttSlice";
 import { z } from "zod";
 import { withZodSchema } from 'formik-validator-zod'
 import { ErrorMessage, Field, Form, Formik, FormikValues } from 'formik';
@@ -15,9 +15,8 @@ export default function Connection() {
 
   const dispatch = useDispatch();
   const connection = useAppSelector(selectConnection);
-  const connectionStatus = useAppSelector(selectStatus);
 
-  const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [isConnected] = useState<boolean>(false);
 
   const formSchema = z.object({
     host: z.string().min(1, 'Required').trim(),

@@ -26,7 +26,6 @@ const SubscriptionModal = ({
   function doAdd() {
     let subscriptionId = uuidv4();
     let subscriptionItemId = uuidv4();
-    let subscriptionItemId2 = uuidv4();
 
     let subscription: Subscription = {
       id: subscriptionId,
