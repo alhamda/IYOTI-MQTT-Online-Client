@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { PublishItem } from '@/models/Publish';
 import { useAppSelector } from '@/redux/hooks';
 import { selectStatus } from '@/redux/slices/mqttSlice';
+import { v4 as uuidv4 } from 'uuid';
 
 const monacoOptions = {
   readOnly: false,
@@ -19,7 +20,7 @@ const monacoOptions = {
 
 export default function Publish({ mqttClient }: { mqttClient: any }) {
 
-  let defaultMessage = `{\n\t"greeting": "Hello!"\n}`;
+  let defaultMessage = `{\n\t"greeting": "Hello world!"\n}`;
 
   const connectionStatus = useAppSelector(selectStatus);
   const [topic, setTopic] = useState<string>('');
@@ -36,6 +37,7 @@ export default function Publish({ mqttClient }: { mqttClient: any }) {
     if (topic && message) {
 
       let publishItem: PublishItem = {
+        id: uuidv4(),
         topic,
         message,
         qos: +qos,

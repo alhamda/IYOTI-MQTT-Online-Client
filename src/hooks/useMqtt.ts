@@ -151,7 +151,7 @@ export default function useMqtt() {
 
   const mqttPublish = (publish: PublishItem) => {
     if (client) {
-      client.publish(publish.topic, publish.message, { qos: publish.qos == 0 ? 0 : publish.qos == 1 ? 1 : 2, retain: publish.retain }, (error) => {
+      client.publish(publish.topic, publish.message, { qos: parseQoS(publish.qos), retain: publish.retain }, (error) => {
         if (error) {
           toast.error('Publish error: ' + error.message);
         } else {
