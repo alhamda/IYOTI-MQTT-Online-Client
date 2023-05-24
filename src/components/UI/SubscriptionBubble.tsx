@@ -1,16 +1,15 @@
 import { SubscriptionItem } from "@/models/Subscription";
-import ReactJson from "rc-json-view";
-import moment from "moment";
 import { useAppSelector } from "@/redux/hooks";
 import { selectSetting } from "@/redux/slices/mqttSlice";
+import moment from "moment";
+import SyntaxHighlighter from "react-syntax-highlighter";
+import { xcode } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
 export default function SubscriptionBubble({ subscriptionItem }: { subscriptionItem: SubscriptionItem }) {
 
   const setting = useAppSelector(selectSetting);
 
   function isJsonString(str: string) {
-    if(!setting.autoJson) return false;
-
     try {
       JSON.parse(str);
     } catch (e) {
@@ -23,18 +22,17 @@ export default function SubscriptionBubble({ subscriptionItem }: { subscriptionI
     <div className="mb-6">
       <div className="bg-white rounded-md border">
         <div className="pt-4 px-4 flex items-center">
-          <div className="text-xs w-full text-gray-500 line-clamp-1 break-all">Topic: {subscriptionItem.topic}</div>
-          <div className="ml-2 text-xs text-gray-500 flex-shrink-0">QoS: {subscriptionItem.qos}</div>
+          <span className="text-xs w-full text-gray-500 line-clamp-1 break-all">Topic: {subscriptionItem.topic}</span>
+          {subscriptionItem.retain && <span className="ml-2 mr-1 rounded-md bg-gray-200 px-2 py-1 text-xs text-gray-500 flex-shrink-0">Retain</span>}
+          <span className="ml-2 text-xs text-gray-500 flex-shrink-0">QoS: {subscriptionItem.qos}</span>
         </div>
-        <div className="p-4 pt-3">
-          {isJsonString(subscriptionItem.message) ?
-            <ReactJson src={JSON.parse(subscriptionItem.message)}
-              name={null}
-              enableClipboard={false}
-              showComma={true}
-              displayObjectSize={false}
-              displayDataTypes={false}
-            /> : <p className="leading-6 break-all">{subscriptionItem.message}</p>}
+        <div className="p-4 pt-3 break-all max-w-full overflow-hidden">
+          {setting.autoJson && isJsonString(subscriptionItem.message) ?
+            <SyntaxHighlighter language="json" style={xcode} wrapLines={true} wrapLongLines={true} customStyle={{ width: '100%', overflow: 'hidden' }}>
+              {subscriptionItem.message}
+            </SyntaxHighlighter> :
+            <p className="break-all">{subscriptionItem.message}</p>
+          }
         </div>
       </div>
       <span className="flex items-center text-xs text-gray-500 mt-2">

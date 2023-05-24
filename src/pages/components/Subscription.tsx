@@ -1,9 +1,11 @@
 import SubscriptionBubble from "@/components/UI/SubscriptionBubble";
 import SubscriptionItem from "@/components/UI/SubscriptionItem";
+import { Subscription } from "@/models/Subscription";
 import Publish from "@/pages/components/Publish";
 import SubscriptionModal from "@/pages/components/SubscriptionModal";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { clearHistory, selectSetting, selectSubscriptionItems, selectSubscriptions, setSetting } from "@/redux/slices/mqttSlice";
+import topicMatch, { matchTopicMethod } from "@/utils/topicMatch";
 import { useEffect, useRef, useState } from "react";
 
 const AlwaysScrollToBottom = () => {
@@ -12,7 +14,7 @@ const AlwaysScrollToBottom = () => {
   return <div ref={elementRef} />;
 };
 
-export default function Subscription({ mqttClient }: { mqttClient: any }) {
+export default function SubscriptionBox({ mqttClient }: { mqttClient: any }) {
 
   const dispatch = useAppDispatch();
   const setting = useAppSelector(selectSetting);
@@ -20,8 +22,17 @@ export default function Subscription({ mqttClient }: { mqttClient: any }) {
   const subscriptions = useAppSelector(selectSubscriptions);
   const subscriptionItems = useAppSelector(selectSubscriptionItems);
 
-  const [subscriptionId, setSubscriptionId] = useState<string | null>(null);
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [showModal, setShowModal] = useState(false);
+
+  const subscriptionItemsData = subscriptionItems.filter((item) => {
+    if (!subscription) return true;
+    return matchTopicMethod(subscription?.topic ?? '', item.topic);
+  });
+
+  useEffect(() => {
+    if (subscriptionItemsData.length == 0 && subscriptions.length == 0) setSubscription(null);
+  }, [subscriptionItemsData, subscriptions])
 
   return (
     <>
@@ -40,13 +51,13 @@ export default function Subscription({ mqttClient }: { mqttClient: any }) {
             </div>
 
             <div className="overflow-y-auto">
-              {subscriptions.map((subscription) => {
+              {subscriptions.map((item) => {
                 return <SubscriptionItem
                   mqttClient={mqttClient}
-                  key={subscription.id}
-                  subscription={subscription}
-                  onClick={() => setSubscriptionId(subscription.id)}
-                  isSelected={subscriptionId == subscription.id}
+                  key={item.id}
+                  subscription={item}
+                  onClick={() => setSubscription(item)}
+                  isSelected={subscription?.id == item.id}
                 />;
               })}
             </div>
@@ -61,7 +72,7 @@ export default function Subscription({ mqttClient }: { mqttClient: any }) {
                         autoJson: e.target.checked
                       }));
                     }} />
-                    <label htmlFor="autoJson" className="ml-2 text-xs">Auto format JSON</label>
+                    <label htmlFor="autoJson" className="ml-2 text-xs">Highlight JSON</label>
                   </div>
                   <div className="flex items-center">
                     <input id="autoScroll" type="checkbox" className="w-3.5 h-3.5 text-blue-500 bg-gray-100 border-gray-300 rounded focus:ring-0 focus:ring-transparent"
@@ -74,7 +85,7 @@ export default function Subscription({ mqttClient }: { mqttClient: any }) {
                   </div>
                 </div>
                 <div className="flex items-center space-x-4 text-xs">
-                  <div onClick={() => dispatch(clearHistory(subscriptionId))} className="flex items-center cursor-pointer text-gray-500 hover:text-red-500">
+                  <div onClick={() => dispatch(clearHistory(subscription))} className="flex items-center cursor-pointer text-gray-500 hover:text-red-500">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5 mr-2">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
                     </svg> Clear History</div>
@@ -84,19 +95,13 @@ export default function Subscription({ mqttClient }: { mqttClient: any }) {
                 </div>
               </div>
               <div className="p-5 h-full w-full overflow-y-auto bg-gray-100 min-h-[500px] max-h-full">
-                {subscriptionItems.filter((item) => {
-                  if (subscriptionId) {
-                    return item.subscriptionId == subscriptionId;
-                  } else {
-                    return true;
-                  }
-                }).map((item) => {
+                {subscriptionItemsData.map((item) => {
                   return <SubscriptionBubble key={item.id} subscriptionItem={item} />;
                 })}
 
-                {(subscriptionItems.length > 0 && setting.autoScroll) && <AlwaysScrollToBottom />}
+                {(subscriptionItemsData.length > 0 && setting.autoScroll) && <AlwaysScrollToBottom />}
 
-                {subscriptionItems.length == 0 && <div className="flex w-full h-full items-center justify-center flex-col">
+                {subscriptionItemsData.length == 0 && <div className="flex w-full h-full items-center justify-center flex-col">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-20 h-20 text-gray-400/70">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
                   </svg>

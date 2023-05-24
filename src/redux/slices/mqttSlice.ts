@@ -2,6 +2,7 @@ import { PublishItem } from '@/models/Publish';
 import { Subscription, SubscriptionItem } from '@/models/Subscription';
 import { RootState } from '@/redux/store';
 import { generateRandomClientId } from '@/utils/helper';
+import { matchTopicMethod } from '@/utils/topicMatch';
 import { createSlice } from '@reduxjs/toolkit';
 import { MqttClient } from 'precompiled-mqtt';
 
@@ -52,7 +53,7 @@ const initialState: initialStateType = {
     sslTls: false,
   },
   setting: {
-    autoJson: true,
+    autoJson: false,
     autoScroll: false,
   }
 }
@@ -71,11 +72,36 @@ export const mqttSlice = createSlice({
     addSubscription: (state, { payload }: { payload: Subscription }) => {
       state.subscriptions.push(payload);
     },
+    pauseSubscription: (state, { payload }: { payload: Subscription }) => {
+      let index = state.subscriptions.findIndex(subscription => subscription.id == payload.id);
+      if (index >= 0) {
+        state.subscriptions[index] = { ...payload, isPaused: true };
+      }
+    },
+    resumeSubscription: (state, { payload }: { payload: Subscription }) => {
+      let index = state.subscriptions.findIndex(subscription => subscription.id == payload.id);
+      if (index >= 0) {
+        state.subscriptions[index] = { ...payload, isPaused: false };
+      }
+    },
     removeSubscription: (state, { payload }: { payload: Subscription }) => {
-      return {
-        ...state,
-        subscriptions: state.subscriptions.filter((subscription) => subscription.id != payload.id),
-        subscriptionItems: state.subscriptionItems.filter((item) => item.subscriptionId != payload.id)
+      if (state.subscriptions.length == 1) {
+
+        return {
+          ...state,
+          subscriptions: [],
+          subscriptionItems: [],
+        };
+
+      } else {
+
+        return {
+          ...state,
+          subscriptions: state.subscriptions.filter((subscription) => subscription.id != payload.id),
+          subscriptionItems: state.subscriptionItems.filter((item) => {
+            return !matchTopicMethod(payload.topic, item.topic);
+          })
+        }
       }
     },
     addSubscriptionItem: (state, { payload }: { payload: SubscriptionItem }) => {
@@ -93,9 +119,11 @@ export const mqttSlice = createSlice({
         ...payload
       }
     },
-    clearHistory: (state, action) => {
-      if (action.payload) {
-        state.subscriptionItems = state.subscriptionItems.filter((item) => item.subscriptionId != action.payload)
+    clearHistory: (state, { payload }: { payload: Subscription | null }) => {
+      if (payload?.topic) {
+        state.subscriptionItems = state.subscriptionItems.filter((item) => {
+          return !matchTopicMethod(payload.topic, item.topic);
+        });
       } else {
         state.subscriptionItems = [];
       }
@@ -106,7 +134,10 @@ export const mqttSlice = createSlice({
 export const {
   reset,
   setStatus,
+  addPublish,
   addSubscription,
+  pauseSubscription,
+  resumeSubscription,
   addSubscriptionItem,
   removeSubscription,
   setConnection,

@@ -43,4 +43,4 @@ const topicMatch = (data: SubscriptionItem[], currentTopic: string): Promise<Sub
     }
   })
 
-export default topicMatch
+export default topicMatch;

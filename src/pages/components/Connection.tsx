@@ -17,8 +17,6 @@ export default function Connection({ mqttClient }: { mqttClient: any }) {
   const connection = useAppSelector(selectConnection);
   const connectionStatus = useAppSelector(selectStatus);
 
-  const [isConnected] = useState<boolean>(false);
-
   const formSchema = z.object({
     host: z.string().min(1, 'Required').trim(),
     port: z.number({ required_error: 'Required', invalid_type_error: 'Invalid Port' }).min(1, 'Invalid Port'),
@@ -109,7 +107,7 @@ export default function Connection({ mqttClient }: { mqttClient: any }) {
 
             </div>
           </div>
-          <div className={clsx(`p-5 border-t`, isConnected ? 'hidden' : 'block')}>
+          <div className={clsx(`p-5 border-t`, connectionStatus == 'Connected' ? 'hidden' : 'block')}>
             <div className="grid grid-cols-3 gap-y-3 gap-x-5">
               <div>
                 <label className="block mb-3 text-sm text-gray-700">

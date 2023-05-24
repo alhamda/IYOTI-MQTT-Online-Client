@@ -3,4 +3,5 @@ export type PublishItem = {
   message: string,
   qos: number,
   date: Date,
+  retain: boolean,
 }

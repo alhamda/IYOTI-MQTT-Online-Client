@@ -1,6 +1,8 @@
+import { PublishItem } from '@/models/Publish';
 import { Subscription, SubscriptionItem } from '@/models/Subscription';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { addSubscriptionItem, selectConnection, selectSubscriptions, setStatus } from '@/redux/slices/mqttSlice';
+import { addPublish, addSubscription, addSubscriptionItem, pauseSubscription, resumeSubscription, selectConnection, selectSubscriptions, setStatus } from '@/redux/slices/mqttSlice';
+import { parseQoS } from '@/utils/helper';
 import mqtt, { MqttClient } from 'precompiled-mqtt';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
@@ -29,10 +31,11 @@ export default function useMqtt() {
         toast.success('Connected');
 
         setTimeout(() => {
-          subscriptions.forEach((subscription) => {
-            console.log(subscription.topic);
-            mqttSubscribe(subscription);
-          });
+          subscriptions
+            .filter(subscription => subscription.isPaused == false)
+            .forEach((subscription) => {
+              mqttSubscribe(subscription, false);
+            });
         }, 1000);
 
       });
@@ -55,6 +58,7 @@ export default function useMqtt() {
           message: message.toString(),
           topic: topic,
           qos: packet.qos,
+          retain: packet.retain,
         }
 
         dispatch(addSubscriptionItem(subscriptionItem));
@@ -79,22 +83,39 @@ export default function useMqtt() {
     }
   }
 
-  const mqttSubscribe = async (subscription: Subscription) => {
+  const mqttPauseSubscription = (subscription: Subscription) => {
+    if (mqttUnSubscribe(subscription)) {
+      dispatch(pauseSubscription(subscription));
+    }
+  }
+
+  const mqttResumeSubscription = async (subscription: Subscription) => {
+    await mqttSubscribe(subscription);
+    dispatch(resumeSubscription(subscription));
+  }
+
+  const mqttSubscribe = async (subscription: Subscription, push?: boolean) => {
     if (client) {
-      let isFinished = false
+      let isFinished = false;
+      let isError = false;
 
       client.subscribe(subscription.topic, {
-        qos: subscription.qos == 0 ? 0 : subscription.qos == 1 ? 1 : 2,
+        qos: parseQoS(subscription.qos),
       }, async (error, granted) => {
         if (error) {
           toast.error('Subscription error: ' + error.message);
+          isError = true;
           return false;
-        } else if (![0, 1, 2].includes(granted[0].qos)) {
+        } else if (Array.isArray(granted) && ![0, 1, 2].includes(granted[0]?.qos)) {
           toast.error('Subscribe failed: Unexpected QoS, please check MQTT broker ACL configuration');
+          isError = true;
           return false;
         }
 
         isFinished = true
+        if (!isError && push) {
+          dispatch(addSubscription(subscription));
+        }
       });
 
       const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -106,7 +127,7 @@ export default function useMqtt() {
       });
 
     } else {
-      toast.error('Client not connected');
+      if(push) toast.error('Client not connected');
       return false;
     }
   }
@@ -115,10 +136,9 @@ export default function useMqtt() {
     if (client) {
 
       client.unsubscribe(subscription.topic, {
-        qos: subscription.qos == 0 ? 0 : subscription.qos == 1 ? 1 : 2
+        qos: parseQoS(subscription.qos)
       }, (error) => {
         if (error) {
-          console.log('Unsubscribe error', error)
           return false;
         }
       });
@@ -129,10 +149,27 @@ export default function useMqtt() {
     }
   }
 
+  const mqttPublish = (publish: PublishItem) => {
+    if (client) {
+      client.publish(publish.topic, publish.message, { qos: publish.qos == 0 ? 0 : publish.qos == 1 ? 1 : 2, retain: publish.retain }, (error) => {
+        if (error) {
+          toast.error('Publish error: ' + error.message);
+        } else {
+          dispatch(addPublish(publish));
+        }
+      })
+    } else {
+      toast.error('Client not connected');
+    }
+  }
+
   return {
     mqttConnect,
     mqttDisconnect,
     mqttSubscribe,
     mqttUnSubscribe,
+    mqttPublish,
+    mqttPauseSubscription,
+    mqttResumeSubscription,
   };
 }

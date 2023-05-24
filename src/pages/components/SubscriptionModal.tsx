@@ -5,6 +5,7 @@ import { useAppDispatch } from '@/redux/hooks';
 import { addSubscription, addSubscriptionItem } from '@/redux/slices/mqttSlice';
 import { v4 as uuidv4 } from 'uuid';
 import { Subscription, SubscriptionItem } from '@/models/Subscription';
+import { toast } from 'react-hot-toast';
 
 const SubscriptionModal = ({
   mqttClient,
@@ -16,8 +17,6 @@ const SubscriptionModal = ({
   setIsOpen: any
 }) => {
 
-  const dispatch = useAppDispatch();
-
   const [topic, setTopic] = useState('');
   const [qos, setQos] = useState('0');
 
@@ -27,15 +26,18 @@ const SubscriptionModal = ({
 
   async function doAdd() {
 
-    let subscription: Subscription = {
-      id: uuidv4(),
-      qos: +qos,
-      topic
-    };
+    if(topic && qos){
+      let subscription: Subscription = {
+        id: uuidv4(),
+        qos: +qos,
+        topic
+      };
 
-    await mqttClient.mqttSubscribe(subscription);
-    dispatch(addSubscription(subscription));
-    closeModal();
+      await mqttClient.mqttSubscribe(subscription, true);
+      closeModal();
+    }else{
+      toast.error('Please type topic and QoS');
+    }
   }
 
   return (
@@ -82,14 +84,14 @@ const SubscriptionModal = ({
                         Topic <Required />
                       </label>
 
-                      <input onChange={(e) => setTopic(e.target.value)} type="text" className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40" />
+                      <input value={topic} onChange={(e) => setTopic(e.target.value.replace(/\s/g, ''))} type="text" className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40" />
                     </div>
                     <div className="mt-6">
                       <label className="block mb-3 text-sm text-gray-700">
                         QoS <Required />
                       </label>
 
-                      <select onChange={(e) => setQos(e.target.value)} className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40">
+                      <select value={qos} onChange={(e) => setQos(e.target.value)} className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40">
                         <option>0</option>
                         <option>1</option>
                         <option>2</option>
@@ -104,7 +106,7 @@ const SubscriptionModal = ({
                         </a>
                       </div>
                       <div className='flex items-center justify-center space-x-4'>
-                        <button onClick={doAdd} className="flex items-center space-x-3 px-4 py-3 text-white transition-colors duration-200 bg-emerald-500 rounded-md hover:bg-emerald-600 focus:outline-none">
+                        <button disabled={topic && qos ? false : true} onClick={doAdd} className="flex items-center space-x-3 px-4 py-3 text-white transition-colors duration-200 bg-emerald-500 rounded-md hover:bg-emerald-600 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-300">
                           Confirm
                         </button>
                       </div>
