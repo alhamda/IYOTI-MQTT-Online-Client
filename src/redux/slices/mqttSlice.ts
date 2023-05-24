@@ -4,16 +4,17 @@ import { RootState } from '@/redux/store';
 import { generateRandomClientId } from '@/utils/helper';
 import { matchTopicMethod } from '@/utils/topicMatch';
 import { createSlice } from '@reduxjs/toolkit';
-import { MqttClient } from 'precompiled-mqtt';
 
 type initialStateType = {
-  status: 'Connected' | 'Disconnected',
+  status: ConnectionStatus,
   subscriptions: Subscription[],
   publishes: PublishItem[],
   subscriptionItems: SubscriptionItem[],
   connection: Connection,
   setting: Setting,
 };
+
+export type ConnectionStatus = 'Connected' | 'Disconnected' | 'Connecting' | 'Disconnecting';
 
 export type Connection = {
   host?: string,
@@ -63,7 +64,7 @@ export const mqttSlice = createSlice({
   initialState: initialState,
   reducers: {
     reset: () => initialState,
-    setStatus: (state, { payload }: { payload: 'Connected' | 'Disconnected' }) => {
+    setStatus: (state, { payload }: { payload: ConnectionStatus }) => {
       state.status = payload;
     },
     addPublish: (state, action) => {

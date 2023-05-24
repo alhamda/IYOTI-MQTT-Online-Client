@@ -1,4 +1,3 @@
-import useMqtt from "@/hooks/useMqtt";
 import { Subscription } from "@/models/Subscription";
 import { useAppDispatch } from "@/redux/hooks";
 import { removeSubscription } from "@/redux/slices/mqttSlice";
@@ -33,7 +32,7 @@ export default function SubscriptionItem({
   return (
     <div className={clsx('transition-all group cursor-pointer flex items-center justify-between space-x-5 p-3 border-b w-full border-r-[2.5px]',
       (isSelected && !subscription.isPaused) && 'border-r-emerald-500 text-emerald-500 font-medium bg-emerald-50/30 hover:bg-emerald-50/30',
-      (isSelected && subscription.isPaused) && '!font-medium border-r-amber-500',
+      (isSelected && subscription.isPaused) && '!font-medium !border-r-amber-500',
       subscription.isPaused && 'font-normal border-r-transparent text-amber-500 bg-amber-50/30 hover:bg-amber-50/30',
       !isSelected && !subscription.isPaused && 'hover:bg-slate-50 text-slate-600 border-r-transparent')}
       onClick={onClick}>

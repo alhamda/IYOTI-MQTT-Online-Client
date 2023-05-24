@@ -8,8 +8,14 @@ export default function ConnectionStatus() {
   return (
     <>
       <span className="relative flex h-3 w-3">
-        <span className={clsx(`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75`, connectionStatus == 'Connected' ? 'bg-green-500' : 'bg-red-500')}></span>
-        <span className={clsx(`relative inline-flex rounded-full h-3 w-3`, connectionStatus == 'Connected' ? 'bg-green-500' : 'bg-red-500')}></span>
+        <span className={clsx(`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75`,
+          connectionStatus == 'Connected' && 'bg-green-500',
+          connectionStatus == 'Disconnected' && 'bg-red-500',
+          (connectionStatus == 'Connecting' || connectionStatus == 'Disconnecting') && 'bg-amber-500',
+        )}></span>
+        <span className={clsx(`relative inline-flex rounded-full h-3 w-3`, connectionStatus == 'Connected' && 'bg-green-500',
+          connectionStatus == 'Disconnected' && 'bg-red-500',
+          (connectionStatus == 'Connecting' || connectionStatus == 'Disconnecting') && 'bg-amber-500')}></span>
       </span>
       <span className="font-normal text-gray-500">{connectionStatus}</span></>
   )

@@ -5,7 +5,7 @@ import Publish from "@/pages/components/Publish";
 import SubscriptionModal from "@/pages/components/SubscriptionModal";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { clearHistory, selectSetting, selectSubscriptionItems, selectSubscriptions, setSetting } from "@/redux/slices/mqttSlice";
-import topicMatch, { matchTopicMethod } from "@/utils/topicMatch";
+import { matchTopicMethod } from "@/utils/topicMatch";
 import { useEffect, useRef, useState } from "react";
 
 const AlwaysScrollToBottom = () => {

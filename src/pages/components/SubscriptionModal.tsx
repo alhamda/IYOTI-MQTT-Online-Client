@@ -1,10 +1,8 @@
 import { Fragment, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import Required from '@/components/UI/Required';
-import { useAppDispatch } from '@/redux/hooks';
-import { addSubscription, addSubscriptionItem } from '@/redux/slices/mqttSlice';
 import { v4 as uuidv4 } from 'uuid';
-import { Subscription, SubscriptionItem } from '@/models/Subscription';
+import { Subscription } from '@/models/Subscription';
 import { toast } from 'react-hot-toast';
 
 const SubscriptionModal = ({

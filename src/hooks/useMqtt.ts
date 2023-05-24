@@ -16,11 +16,12 @@ export default function useMqtt() {
   const subscriptions = useAppSelector(selectSubscriptions);
 
   const mqttConnect = () => {
-    // if (connection.host) {
-    setClient(
-      mqtt.connect('ws://broker.emqx.io:8083/mqtt', { clientId: uuidv4() }),
-    );
-    // }
+    if (connection.host) {
+      dispatch(setStatus('Connecting'));
+      setClient(
+        mqtt.connect('ws://broker.emqx.io:8083/mqtt', { clientId: uuidv4() }),
+      );
+    }
   }
 
   useEffect(() => {
@@ -30,13 +31,11 @@ export default function useMqtt() {
         dispatch(setStatus('Connected'));
         toast.success('Connected');
 
-        setTimeout(() => {
-          subscriptions
-            .filter(subscription => subscription.isPaused == false)
-            .forEach((subscription) => {
-              mqttSubscribe(subscription, false);
-            });
-        }, 1000);
+        subscriptions
+          .filter(subscription => subscription.isPaused == false)
+          .forEach((subscription) => {
+            mqttSubscribe(subscription, false);
+          });
 
       });
 
@@ -46,7 +45,7 @@ export default function useMqtt() {
       });
 
       client.on('reconnect', () => {
-        dispatch(setStatus('Disconnected'));
+        dispatch(setStatus('Connecting'));
         toast.error('Reconnecting...');
       });
 
@@ -69,6 +68,7 @@ export default function useMqtt() {
 
   const mqttDisconnect = () => {
     if (client) {
+      dispatch(setStatus('Disconnecting'));
       try {
         client.end(false, () => {
           dispatch(setStatus('Disconnected'));
@@ -127,7 +127,7 @@ export default function useMqtt() {
       });
 
     } else {
-      if(push) toast.error('Client not connected');
+      if (push) toast.error('Client not connected');
       return false;
     }
   }
