@@ -120,13 +120,22 @@ export const mqttSlice = createSlice({
         ...payload
       }
     },
-    clearHistory: (state, { payload }: { payload: Subscription | null }) => {
+    clearSubscriptionHistory: (state, { payload }: { payload: Subscription | null }) => {
       if (payload?.topic) {
         state.subscriptionItems = state.subscriptionItems.filter((item) => {
           return !matchTopicMethod(payload.topic, item.topic);
         });
       } else {
         state.subscriptionItems = [];
+      }
+    },
+    clearPublishedHistory: (state, { payload }: { payload: Subscription | null }) => {
+      if (payload?.topic) {
+        state.publishes = state.publishes.filter((item) => {
+          return !matchTopicMethod(payload.topic, item.topic);
+        });
+      } else {
+        state.publishes = [];
       }
     }
   },
@@ -143,7 +152,8 @@ export const {
   removeSubscription,
   setConnection,
   setSetting,
-  clearHistory,
+  clearSubscriptionHistory,
+  clearPublishedHistory,
 } = mqttSlice.actions;
 
 export const selectSubscriptions = (state: RootState) => state.mqtt.subscriptions;

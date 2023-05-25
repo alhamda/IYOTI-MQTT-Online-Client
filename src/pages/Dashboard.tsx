@@ -1,5 +1,6 @@
+import Footer from "@/components/UI/Footer";
 import useMqtt from "@/hooks/useMqtt";
-import Connection from "@/pages/components/Connection";
+import ConnectionBar from "@/pages/components/ConnectionBar";
 import Wrapper from "@/pages/components/Wrapper";
 import { useAppDispatch } from "@/redux/hooks";
 import { setStatus } from "@/redux/slices/mqttSlice";
@@ -15,12 +16,10 @@ export default function Dashboard() {
 
   return (
     <div className="lg:max-w-6xl mx-auto lg:py-10 w-full">
-      <Connection mqttClient={mqttClient} />
+      <ConnectionBar mqttClient={mqttClient} />
       <Wrapper mqttClient={mqttClient} />
 
-      <div className="mx-auto border-t text-center text-xs text-gray-500 bg-white p-3 rounded-b-md shadow-lg">
-        Copyright &copy; 2023&nbsp;<a href="#" className="hover:underline hover:text-emerald-600">iyoti.id</a>. All rights reserved
-      </div>
+      <Footer />
     </div>
   )
 }

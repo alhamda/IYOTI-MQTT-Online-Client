@@ -1,7 +1,7 @@
 import { PublishItem } from '@/models/Publish';
 import { Subscription, SubscriptionItem } from '@/models/Subscription';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { addPublish, addSubscription, addSubscriptionItem, pauseSubscription, resumeSubscription, selectConnection, selectSubscriptions, setStatus } from '@/redux/slices/mqttSlice';
+import { Connection, addPublish, addSubscription, addSubscriptionItem, pauseSubscription, resumeSubscription, selectStatus, selectSubscriptions, setStatus } from '@/redux/slices/mqttSlice';
 import { parseQoS } from '@/utils/helper';
 import mqtt, { MqttClient } from 'precompiled-mqtt';
 import { useEffect, useState } from 'react';
@@ -12,16 +12,41 @@ export default function useMqtt() {
   const dispatch = useAppDispatch();
 
   const [client, setClient] = useState<MqttClient | null>(null);
-  const connection = useAppSelector(selectConnection);
   const subscriptions = useAppSelector(selectSubscriptions);
+  const connectionStatus = useAppSelector(selectStatus);
 
-  const mqttConnect = () => {
-    if (connection.host) {
+  const mqttConnect = (connection: Connection) => {
+
+    if (connection) {
       dispatch(setStatus('Connecting'));
-      setClient(
-        mqtt.connect('ws://broker.emqx.io:8083/mqtt', { clientId: uuidv4() }),
-      );
+
+      let options: mqtt.IClientOptions = {
+        clientId: connection.clientId,
+        username: connection.username,
+        password: connection.password,
+        clean: connection.cleanSession,
+        rejectUnauthorized: connection.sslTls,
+        keepalive: connection.keepAlive,
+        reconnectPeriod: 3000,
+      };
+
+      if (connection.lastWill && connection.lastWillTopic) {
+        options.will = {
+          topic: connection.lastWillTopic,
+          payload: connection.lastWillMessage ?? '',
+          qos: parseQoS(+(connection.lastWillQos ?? 0)),
+          retain: connection.lastWillRetain ?? false,
+        }
+      }
+
+      let path: string = '/mqtt';
+
+      let protocol = connection.sslTls ? 'wss://' : 'ws://';
+      let url = protocol + connection.host + ':' + connection.port + path;
+
+      setClient(mqtt.connect(url, options));
     }
+
   }
 
   useEffect(() => {
@@ -46,7 +71,17 @@ export default function useMqtt() {
 
       client.on('reconnect', () => {
         dispatch(setStatus('Connecting'));
-        toast.error('Reconnecting...');
+
+        const toastId = toast.loading('Reconnecting', {
+          iconTheme: {
+            primary: '#FDC426',
+            secondary: '#F4F4F4',
+          }
+        });
+        setTimeout(() => {
+          toast.dismiss(toastId);
+        }, 2000);
+
       });
 
       client.on('message', (topic, message, packet) => {
@@ -70,10 +105,12 @@ export default function useMqtt() {
     if (client) {
       dispatch(setStatus('Disconnecting'));
       try {
-        client.end(false, () => {
+        client.end(true, () => {
           dispatch(setStatus('Disconnected'));
           toast.error('Disconnected');
-        })
+        });
+
+        setClient(null);
       } catch (error) {
         toast.error('Disconnected error: ' + error?.toString());
         return false;
@@ -90,7 +127,7 @@ export default function useMqtt() {
   }
 
   const mqttResumeSubscription = async (subscription: Subscription) => {
-    await mqttSubscribe(subscription);
+    if (connectionStatus == 'Connected') await mqttSubscribe(subscription);
     dispatch(resumeSubscription(subscription));
   }
 
@@ -164,6 +201,7 @@ export default function useMqtt() {
   }
 
   return {
+    setClient,
     mqttConnect,
     mqttDisconnect,
     mqttSubscribe,
