@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Required from "@/components/UI/Required";
 import clsx from "clsx";
 import { useDispatch } from "react-redux";
@@ -80,9 +80,9 @@ export default function ConnectionBar({ mqttClient }: { mqttClient: any }) {
         <div className="bg-white shadow-lg rounded-t-md border-b">
           <div className="p-5 flex items-center justify-between space-x-5">
             <div className="text-lg flex flex-col space-y-0.5">
-              <div className="flex items-center">
+              <div className="flex items-end">
                 <div className="font-semibold mb-0">MQTT Online Client</div>
-                <div className="ml-2 text-xs text-gray-500">by <a href="https://iyoti.id" target="_blank" className="text-sm text-emerald-600 hover:underline hover:cursor-pointer">IYOTI</a></div>
+                <div className="ml-2 mb-1 text-xs text-gray-500">by <a href="https://iyoti.id" target="_blank" className="text-sm text-emerald-600 hover:underline hover:cursor-pointer">IYOTI</a></div>
               </div>
               <div className="flex items-center space-x-2 text-sm pt-1">
                 <ConnectionStatus />
@@ -153,7 +153,7 @@ export default function ConnectionBar({ mqttClient }: { mqttClient: any }) {
                     {protocol}
                   </div>
 
-                  <Field name="host" type="text" className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 rounded-l-none border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40" />
+                  <Field name="host" type="text" className="bg-white focus:bg-white block w-full px-4 py-2 text-gray-700 placeholder-gray-400 rounded-l-none border border-gray-200 rounded-md focus:border-gray-400 focus:ring-gray-400 transition-colors focus:outline-none focus:ring-0 focus:ring-opacity-40" onChange={(e: any) => setFieldValue('host', e.target.value.replace(/\s/g, ''))} />
 
                 </div>
 

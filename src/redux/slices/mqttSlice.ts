@@ -44,7 +44,7 @@ const initialState: initialStateType = {
   subscriptionItems: [],
   connection: {
     host: 'free.mqtt.iyoti.id',
-    port: 1883,
+    port: 8083,
     clientId: generateRandomClientId(),
     keepAlive: 60,
     cleanSession: true,

@@ -65,8 +65,10 @@ export default function useMqtt() {
       });
 
       client.on('error', (err) => {
-        toast.error(`Connection error: ${err.message}`);
+        toast.error(`${err.message}`);
         dispatch(setStatus('Disconnected'));
+        client.end();
+        setClient(null);
       });
 
       client.on('reconnect', () => {
