@@ -28,6 +28,7 @@ const SubscriptionModal = ({
       let subscription: Subscription = {
         id: uuidv4(),
         qos: +qos,
+        isPaused: false,
         topic
       };
 

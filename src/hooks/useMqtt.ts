@@ -57,7 +57,7 @@ export default function useMqtt() {
         toast.success('Connected');
 
         subscriptions
-          .filter(subscription => subscription.isPaused == false)
+          .filter(subscription => !subscription.isPaused)
           .forEach((subscription) => {
             mqttSubscribe(subscription, false);
           });
