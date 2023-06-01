@@ -78,7 +78,7 @@ export default function ConnectionBar({ mqttClient }: { mqttClient: any }) {
     >
       {({ setFieldValue, values }) => <Form autoComplete='off'>
         <div className="bg-white shadow-lg rounded-t-md border-b">
-          <div className="p-5 flex items-center justify-between space-x-5">
+          <div className="p-5 flex items-center justify-between flex-wrap lg:space-x-5 space-y-5 lg:space-y-0">
             <div className="text-lg flex flex-col space-y-0.5">
               <div className="flex items-end">
                 <div className="font-semibold mb-0">MQTT Online Client</div>
@@ -142,7 +142,7 @@ export default function ConnectionBar({ mqttClient }: { mqttClient: any }) {
             </div>
           </div>
           <div className={clsx(`p-5 border-t`, connectionForm ? 'block' : 'hidden')}>
-            <div className="grid grid-cols-3 gap-y-3 gap-x-5">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-y-3 gap-x-5">
               <div>
                 <label className="block mb-3 text-sm text-gray-700">
                   Host <Required />
@@ -241,8 +241,8 @@ export default function ConnectionBar({ mqttClient }: { mqttClient: any }) {
                 </div>
               </div>
             </div>
-            <div className={clsx(`grid grid-cols-3 gap-y-3 gap-x-5 mt-5`, values.lastWill ? '' : 'hidden')}>
-              <div className="col-span-2">
+            <div className={clsx(`grid grid-cols-1 lg:grid-cols-3 gap-y-3 gap-x-5 mt-5`, values.lastWill ? '' : 'hidden')}>
+              <div className="col-span-1 lg:col-span-2">
                 <label className="block mb-3 text-sm text-gray-700">
                   Last-Will Topic
                 </label>
@@ -252,7 +252,7 @@ export default function ConnectionBar({ mqttClient }: { mqttClient: any }) {
                 <ErrorMessage name="lastWillTopic" component='div' className='text-red-600 mt-2 font-normal text-xs' />
               </div>
 
-              <div className="flex space-x-5 items-start justify-start">
+              <div className="col-span-1 flex space-x-5 items-start justify-start">
                 <div className="w-full">
                   <label className="block mb-3 text-sm text-gray-700">
                     Last-Will QoS
@@ -282,7 +282,7 @@ export default function ConnectionBar({ mqttClient }: { mqttClient: any }) {
                 </div>
               </div>
 
-              <div className="col-span-3">
+              <div className="col-span-1 lg:col-span-3">
                 <label className="block mb-3 text-sm text-gray-700">
                   Last-Will Message
                 </label>

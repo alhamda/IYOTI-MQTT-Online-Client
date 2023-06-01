@@ -14,7 +14,7 @@ export default function Wrapper({ mqttClient }: { mqttClient: any }) {
   return (
     <>
       <div className="bg-white shadow-lg">
-        <div className="flex flex-row max-h-[870px]">
+        <div className="flex flex-col lg:flex-row lg:max-h-[870px]">
 
           <SubscriptionBar
             mqttClient={mqttClient}

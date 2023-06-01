@@ -17,7 +17,7 @@ export default function Menu({
   const setting = useAppSelector(selectSetting);
 
   return (
-    <div className="p-3 px-5 border-b flex justify-between bg-white sticky -top-1 z-10">
+    <div className="p-3 px-5 border-b flex justify-between bg-white lg:sticky lg:-top-1 lg:z-10">
       <div className="flex items-center justify-between space-x-4">
         <div className="flex items-center">
           <input id="autoJson" type="checkbox" className="w-3.5 h-3.5 text-blue-500 bg-gray-100 border-gray-300 rounded focus:ring-0 focus:ring-transparent" checked={setting.autoJson} onChange={(e) => {
