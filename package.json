@@ -18,7 +18,6 @@
     "formik-validator-zod": "^1.0.2",
     "moment": "^2.29.4",
     "precompiled-mqtt": "^4.3.14-beta",
-    "rc-json-view": "^1.21.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",
